@@ -15,15 +15,15 @@ function check_pgbench_tables() {
             WHERE n.nspname = 'public'
             AND c.relname = tbl
             AND c.relkind = 'r'
-          ) THEN 
+          ) THEN
             RAISE EXCEPTION 'pgbench table "%" does not exist!', tbl;
           END IF;
         END LOOP;
-      END 
+      END
     \$\$;
 EOSQL
   psql_status=$?
-  
+
   case $psql_status in
     0) echo "All pgbench tables exist! We can begin the benchmark" ;;
     1) echo "psql encountered a fatal error!" ;;
@@ -39,23 +39,23 @@ function initialize_pgbench_tables() {
   pgbench -i -F ${FILL_FACTOR:=100} -s ${SCALE_FACTOR:=100} --foreign-keys
 }
 
-export PGDATABASE=pgbench
-export PGUSER=pgbench
-export PGPASSWORD=${PGBENCH_PASSWORD}
-export PGHOST=${DB_1_PORT_5432_TCP_ADDR}
-export PGPORT=${DB_1_PORT_5432_TCP_PORT}
+export PGDATABASE=${DB_DATABASE}
+export PGUSER=${DB_USER}
+export PGPASSWORD=${DB_PASSWORD}
+export PGHOST=${DB_HOST}
+export PGPORT=${DB_PORT}
 
 echo '*************** Waiting for postgres ***************'
-echo '**                                                **'
-echo "** PGDATABASE: ${PGDATABASE}                      **"
-echo "** PGHOST:     ${PGHOST}                          **"
-echo "** PGPORT:     ${PGPORT}                          **"
-echo "** PGUSER:     ${PGUSER}                          **"
-echo '**                                                **'
+echo '**'
+echo "** PGDATABASE: ${PGDATABASE}"
+echo "** PGHOST: ${PGHOST}"
+echo "** PGPORT: ${PGPORT}"
+echo "** PGUSER: ${PGUSER}"
+echo '**'
 echo '****************************************************'
 
 attempt=1
-while (! pg_isready -t 1 ) && [[ $attempt -lt 100 ]]; do 
+while (! pg_isready -t 1 ) && [[ $attempt -lt 100 ]]; do
   sleep 1
 done
 
